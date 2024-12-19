@@ -43,5 +43,5 @@ __MACOSX
 *.exe
 *.out
 *.app
-
-
+main
+*.o
