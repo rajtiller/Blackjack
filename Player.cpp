@@ -140,7 +140,7 @@ double Player::calculate_value_on_split(Hand& hand, Hand& dealer_hand,
   }
   return ev;
 }
-std::pair<Player::Choice, double> Player::get_choice_with_prob(
+std::pair<Choice, double> Player::get_choice_with_prob(
     Hand& hand, Hand& dealer_hand, std::vector<int>& deck, bool split_valid) {
   auto best = Choice::STAND;
   auto odds = calculate_value_on_stand(hand, dealer_hand, deck);
@@ -164,7 +164,7 @@ std::pair<Player::Choice, double> Player::get_choice_with_prob(
   }
   return {best, odds};
 }
-Player::Choice Player::get_choice(Hand& hand, Hand& dealer_hand,
+Choice Player::get_choice(Hand& hand, Hand& dealer_hand,
                                   std::vector<int>& deck) {
   cache.clear();
   return get_choice_with_prob(hand, dealer_hand, deck).first;

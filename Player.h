@@ -25,20 +25,8 @@ struct Hand
     bool splittable;
 };
 
-class Player
-{
-public:
-    Choice get_choice(Hand &hand, Hand &dealer, std::vector<int> &deck){return STAND;};
-};
-
 class Player {
  public:
-  struct Hand {
-    int sum;
-    bool soft;
-    bool splittable;
-  };
-  enum Choice { HIT, STAND, DOUBLE, SPLIT };
   class Cache {
    private:
     int hits = 0;
