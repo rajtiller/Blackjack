@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++20 -Wall -Wextra -g
+CXXFLAGS = -std=c++20 -Wall -Wextra -g -Ofast
 
 # List of object files
 OBJS_MAIN = main.o Player.o

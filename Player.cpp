@@ -31,11 +31,16 @@ double Player::calculate_value_on_hit(Hand& hand, Hand& dealer_hand,
     if (card_count == 0) {
       continue;
     }
+    bool changed_splittable = false;
+    if (hand.splittable && hand.sum != card) {
+      hand.splittable = false;
+      changed_splittable = true;
+    }
     hand.sum += card;
-    bool changed = false;
+    bool changed_soft = false;
     if (card == 1 && !hand.soft) {
       hand.soft = true;
-      changed = true;
+      changed_soft = true;
     }
     deck[card] -= 1;
     deck_count += card_count;
@@ -50,8 +55,11 @@ double Player::calculate_value_on_hit(Hand& hand, Hand& dealer_hand,
     ev += std::max(std::max(hit_ev, stand_ev), std::max(split_ev, double_ev)) *
           card_count;
     deck[card] += 1;
-    if (changed) {
+    if (changed_soft) {
       hand.soft = false;
+    }
+    if (changed_splittable) {
+      hand.splittable = true;
     }
     hand.sum -= card;
   }
