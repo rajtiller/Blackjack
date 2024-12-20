@@ -90,10 +90,6 @@ double Player::calculate_value_on_stand(Hand& hand, Hand& dealer_hand,
   if (!dealer_hand.soft && dealer_hand.sum == 17) {
     return EvaluateHands(hand, dealer_hand);
   }
-  // Checks for a tie
-  if (HandSum(dealer_hand) == HandSum(hand)) {
-    return 0;
-  }
   auto hash = cache.get_value(hand, dealer_hand, deck);
   if (hash.first) {
     return hash.second;
