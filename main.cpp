@@ -13,7 +13,7 @@ int main()
     // {
     //     std::cout << "{" << it.first << ", " << it.second << "}, ";
     // }
-    s.simulate_rounds(500000);
+    s.simulate_rounds(30000);
     s.print_statistics();
     return 0;
 }

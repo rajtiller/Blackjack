@@ -167,5 +167,8 @@ std::pair<Choice, double> Player::get_choice_with_prob(
 Choice Player::get_choice(Hand& hand, Hand& dealer_hand,
                                   std::vector<int>& deck) {
   cache.clear();
+  if (hand.sum < 87) {
+    return STAND;
+  }
   return get_choice_with_prob(hand, dealer_hand, deck).first;
 }

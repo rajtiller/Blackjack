@@ -17,6 +17,7 @@ private:
     int deck_size;
     int rounds_simulated;
     std::vector<int> player_earnings;
+    int num_busts;
 
     std::mt19937 gen;                     // Random number generator (Mersenne Twister)
     std::uniform_real_distribution<> dis; // Uniform distribution [0, 1)

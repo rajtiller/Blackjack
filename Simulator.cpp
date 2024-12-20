@@ -26,6 +26,7 @@ Simulator::Simulator(std::vector<Player *> player_ptrs, std::vector<int> player_
         players[i + 1] = player_ptrs[i];
     }
     player_earnings.resize(num_players + 1, 0);
+    num_busts=0;
 }
 void Simulator::simulate_rounds(int num_rounds)
 {
@@ -71,6 +72,10 @@ void Simulator::simulate_rounds(int num_rounds)
                     break;
                 case SPLIT:
                 {
+                    if (!curr_player_hand.splittable) {
+                        curr_hand_done = true;
+                        break;
+                    }
                     int new_card_1 = draw_card(); // goes to new_hand
                     Hand new_hand = {curr_player_hand.player_inx, curr_player_hand.sum / 2 + new_card_1, curr_player_hand.sum == 2, 1, new_card_1 * 2 == curr_player_hand.sum};
                     player_hands.push_back({new_hand});
@@ -90,7 +95,7 @@ void Simulator::simulate_rounds(int num_rounds)
             }
             curr_hand_inx++;
         }
-        while (player_hands[0].sum < 17 || (player_hands[0].sum == 17 && player_hands[0].soft))
+        while (player_hands[0].sum < 2 || (player_hands[0].sum == 17 && player_hands[0].soft))
         {
             int new_card = draw_card();
             if (new_card == 1)
@@ -105,6 +110,9 @@ void Simulator::simulate_rounds(int num_rounds)
             Hand &curr_hand = player_hands.back(); // might wanna change this back to non-reference
             player_hands.pop_back();
             player_earnings[curr_hand.player_inx] += player_wins(curr_hand) * curr_hand.bet;
+        }
+        if (player_hands[0].sum > 21) {
+            num_busts++;
         }
         for (int i = player_hands.size() - 1; i >= 0; i--)
         {                                      // player_earnings[0] will be nonzero but thats fine
@@ -193,4 +201,5 @@ void Simulator::print_statistics()
             std::cout << "\n\nPlayer " << i << ": " << std::setprecision(4) << 100.0 * player_earnings[i] / rounds_simulated / num_of_that_player << cent << " per round\n\n";
         }
     }
+    std::cout << "Dealer Bust Rate: " << 100.0*double(num_busts)/rounds_simulated << "%\n\n";
 }

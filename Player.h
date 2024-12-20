@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <iomanip>
+#include <cassert>
 enum Choice
 {
     HIT,
