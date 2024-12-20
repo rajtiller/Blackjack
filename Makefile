@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -g
 
 # List of object files
-OBJS_MAIN = main.o
+OBJS_MAIN = main.o Player.o
 
 # Output executables
 MAIN_EXEC = main
