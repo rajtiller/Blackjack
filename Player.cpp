@@ -1,6 +1,5 @@
 #include "Player.h"
 
-#include <iostream>
 int Player::HandSum(Hand& hand) {
   if (hand.soft && hand.sum <= 10) {
     return hand.sum + 10;
@@ -172,9 +171,5 @@ std::pair<Player::Choice, double> Player::get_choice_with_prob(
 Player::Choice Player::get_choice(Hand& hand, Hand& dealer_hand,
                                   std::vector<int>& deck) {
   cache.clear();
-  auto result = get_choice_with_prob(hand, dealer_hand, deck);
-  std::cout << "Prob: " << result.second << "\n";
-  std::cout << "CACHE size: " << cache.get_size() << "\n";
-  std::cout << "Hit rate size: " << cache.get_hit_rate() << "\n";
-  return result.first;
+  return get_choice_with_prob(hand, dealer_hand, deck).first;
 }
