@@ -9,6 +9,53 @@ class Player {
     bool splittable;
   };
   enum Choice { HIT, STAND, DOUBLE, SPLIT };
+  class Cache {
+   private:
+    int hits = 0;
+    int misses = 0;
+    std::unordered_map<int, double> cache;
+    void hash_combine(std::size_t& hash, const std::size_t& new_value) {
+      hash ^= new_value + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    }
+
+   public:
+    double get_hit_rate() { return (double)hits / (double)(hits + misses); }
+    int get_size() { return cache.size(); }
+    int hash(Hand const& hand, Hand const& dealer_hand,
+             std::vector<int> const& deck) {
+      std::size_t hash = 8723;
+      hash_combine(hash, hand.sum);
+      hash_combine(hash, hand.soft);
+      hash_combine(hash, dealer_hand.sum);
+      hash_combine(hash, dealer_hand.soft);
+      for (int card = 1; card <= 10; card++) {
+        hash_combine(hash, deck.at(card));
+      }
+      return hash;
+    }
+    std::pair<bool, double> get_value(Hand& hand, Hand& dealer_hand,
+                                      std::vector<int>& deck) {
+      auto hash = Cache::hash(hand, dealer_hand, deck);
+      // return std::make_pair(false, 0.0);
+      if (cache.find(hash) == cache.end()) {
+        misses++;
+        return std::make_pair(false, 0.0);
+      }
+      hits++;
+      return std::make_pair(true, cache.at(hash));
+    }
+    void set_value(Hand& hand, Hand& dealer_hand, std::vector<int>& deck,
+                   double value) {
+      auto hash = Cache::hash(hand, dealer_hand, deck);
+      cache.insert({hash, value});
+    }
+    void clear() {
+      hits = 0;
+      misses = 0;
+      cache.clear();
+    }
+  };
+  Player::Cache cache;
 
  private:
   int HandSum(Hand& hand);

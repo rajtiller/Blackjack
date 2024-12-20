@@ -1,4 +1,6 @@
 #include "Player.h"
+
+#include <iostream>
 int Player::HandSum(Hand& hand) {
   if (hand.soft && hand.sum <= 10) {
     return hand.sum + 10;
@@ -44,10 +46,10 @@ double Player::calculate_value_on_hit(Hand& hand, Hand& dealer_hand,
     }
     deck[card] -= 1;
     deck_count += card_count;
+    double stand_ev = calculate_value_on_stand(hand, dealer_hand, deck);
     double hit_ev = max_hits > 0 ? calculate_value_on_hit(hand, dealer_hand,
                                                           deck, max_hits - 1)
                                  : -1;
-    double stand_ev = calculate_value_on_stand(hand, dealer_hand, deck);
     double split_ev =
         split_after ? calculate_value_on_split(hand, dealer_hand, deck) : -1;
     double double_ev =
@@ -93,6 +95,10 @@ double Player::calculate_value_on_stand(Hand& hand, Hand& dealer_hand,
   if (HandSum(dealer_hand) == HandSum(hand)) {
     return 0;
   }
+  auto hash = cache.get_value(hand, dealer_hand, deck);
+  if (hash.first) {
+    return hash.second;
+  }
   double ev = 0;
   int deck_count = 0;
   for (int card = 1; card <= 10; card++) {
@@ -118,6 +124,7 @@ double Player::calculate_value_on_stand(Hand& hand, Hand& dealer_hand,
   if (deck_count == 0) {
     return EvaluateHands(hand, dealer_hand);
   }
+  cache.set_value(hand, dealer_hand, deck, ev / (double)deck_count);
   return ev / (double)deck_count;
 }
 double Player::calculate_value_on_double(Hand& hand, Hand& dealer_hand,
@@ -126,12 +133,16 @@ double Player::calculate_value_on_double(Hand& hand, Hand& dealer_hand,
 }
 double Player::calculate_value_on_split(Hand& hand, Hand& dealer_hand,
                                         std::vector<int>& deck) {
-  if (!hand.splittable) {
+  if (!hand.splittable || hand.sum == 20) {
     return -1;
   }
   hand.sum /= 2;
+  hand.soft = false;
   double ev = get_choice_with_prob(hand, dealer_hand, deck, false).second * 2;
   hand.sum *= 2;
+  if (hand.sum == 2) {
+    hand.soft = true;
+  }
   return ev;
 }
 std::pair<Player::Choice, double> Player::get_choice_with_prob(
@@ -160,5 +171,10 @@ std::pair<Player::Choice, double> Player::get_choice_with_prob(
 }
 Player::Choice Player::get_choice(Hand& hand, Hand& dealer_hand,
                                   std::vector<int>& deck) {
-  return get_choice_with_prob(hand, dealer_hand, deck).first;
+  cache.clear();
+  auto result = get_choice_with_prob(hand, dealer_hand, deck);
+  std::cout << "Prob: " << result.second << "\n";
+  std::cout << "CACHE size: " << cache.get_size() << "\n";
+  std::cout << "Hit rate size: " << cache.get_hit_rate() << "\n";
+  return result.first;
 }
